@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: api
+    container_name: api
+    volumes:
+      - ./ruCLIP_model/:/opt/rec_system/ruCLIP_model/
+    ports:
+      - "8080:8080"
+    restart: on-failure
+
+  recommendations:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: recommendations
+    container_name: recommendations
+    ports:
+      - "8502:81"
+    links:
+      - api
+    depends_on:
+      - api
+    restart: on-failure
+    command: >
+      bash -c "streamlit run src/web/app.py --server.port 81"
+
+  search:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: search
+    container_name: search
+    ports:
+      - "8501:80"
+    links:
+      - api
+    depends_on:
+      - api
+    restart: on-failure
+    command: >
+      bash -c "streamlit run src/web/app.py --server.port 80"

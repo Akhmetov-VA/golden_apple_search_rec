@@ -1,0 +1,6 @@
+*
+!data
+!docker
+!src
+!.dockerignore
+!docker-compose.yml
